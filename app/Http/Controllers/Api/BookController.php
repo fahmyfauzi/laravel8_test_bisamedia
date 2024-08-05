@@ -96,7 +96,7 @@ class BookController extends Controller
         if (!$book) {
             return response()->json([
                 'success' => false,
-                'message' => 'Book not found or you do not have permission to update this book.'
+                'message' => 'Buku tidak ditemukan atau Anda tidak memiliki izin untuk memperbarui buku ini!'
             ], 404);
         }
 
@@ -117,8 +117,19 @@ class BookController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function destroy($id)
+    public function destroy(Request $request, $id)
     {
-        //
+        $book = Book::where('user_id', $request->user()->id)->where('id', $id)->first();
+        // cek buku jika tidak ada
+        if (!$book) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Buku tidak ditemukan atau Anda tidak memiliki izin untuk hapus buku ini!'
+            ], 404);
+        }
+
+        $book->delete();
+
+        return new BookResource(true, "Buku Berhasil Dihapus!", null);
     }
 }
