@@ -67,16 +67,6 @@ class BookController extends Controller
         return new BookResource(true, "Buku ditemukan!", $book);
     }
 
-    /**
-     * Show the form for editing the specified resource.
-     *
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
-    public function edit($id)
-    {
-        //
-    }
 
     /**
      * Update the specified resource in storage.
@@ -87,7 +77,38 @@ class BookController extends Controller
      */
     public function update(Request $request, $id)
     {
-        //
+        // set validator
+        $validator = Validator::make($request->all(), [
+            'title' => 'required',
+            'author' => 'required',
+            'price' => 'required|numeric'
+        ]);
+
+        // jika validator gagal
+        if ($validator->fails()) {
+            return response()->json($validator->errors(), 422);
+        }
+
+        // cari buku user yang login
+        $book = Book::where('user_id', $request->user()->id)->where('id', $id)->first();
+
+        // cek buku jika tidak ada
+        if (!$book) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Book not found or you do not have permission to update this book.'
+            ], 404);
+        }
+
+        // update buku
+        $book->update([
+            'title' => $request->title,
+            'author' => $request->author,
+            'price' => $request->price
+        ]);
+
+        // return book
+        return new BookResource(true, 'Buku Berhasil ditambahkan!', $book);
     }
 
     /**
