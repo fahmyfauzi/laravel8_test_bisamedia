@@ -15,9 +15,11 @@ class BookController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function index()
+    public function index(Request $request)
     {
-        //
+        $books = Book::where('user_id', $request->user()->id)->latest()->paginate(10);
+
+        return new BookResource(true, "List Data Buku!", $books);
     }
 
 
