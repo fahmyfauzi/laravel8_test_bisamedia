@@ -21,10 +21,10 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
 
 
 // route auth
-Route::post('register', App\Http\Controllers\Api\RegisterController::class)->name('auth.register');
+Route::post('register', App\Http\Controllers\Api\RegisterController::class)->name('register');
 
-Route::post('login', App\Http\Controllers\Api\LoginController::class)->name('auth.login');
-Route::post('logout', App\Http\Controllers\Api\LogoutController::class)->name('auth.logout');
+Route::post('login', App\Http\Controllers\Api\LoginController::class)->name('login');
+Route::post('logout', App\Http\Controllers\Api\LogoutController::class)->name('logout');
 
 Route::resource('books', BookController::class)
     ->except(['edit', 'create'])->middleware('auth:api');

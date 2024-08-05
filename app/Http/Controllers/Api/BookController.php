@@ -6,11 +6,14 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\BookRequest;
 use App\Http\Resources\BookResource;
 use App\Models\Book;
+use App\Services\BookService;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Validator;
 
 class BookController extends Controller
 {
+    public function __construct(public BookService $bookService)
+    {
+    }
     /**
      * Display a listing of the resource.
      *
@@ -18,7 +21,8 @@ class BookController extends Controller
      */
     public function index(Request $request)
     {
-        $books = Book::where('user_id', $request->user()->id)->latest()->paginate(10);
+        // get all book user
+        $books = $this->bookService->getAllBook($request->user()->id);
 
         return new BookResource(true, "List Data Buku!", $books);
     }
@@ -52,7 +56,11 @@ class BookController extends Controller
     public function show($id, Request $request)
     {
         // find book by id
-        $book = Book::where('user_id', $request->user()->id)->where('id', $id)->first();
+        $book = $this->bookService->getBookById($request->user()->id, $id);
+
+        // cek buku jika tidak ada
+        if (!$book) return $this->bookService->checkBook($book);
+
         return new BookResource(true, "Buku ditemukan!", $book);
     }
 
@@ -66,16 +74,11 @@ class BookController extends Controller
      */
     public function update(BookRequest $request, $id)
     {
-        // cari buku user yang login
-        $book = Book::where('user_id', $request->user()->id)->where('id', $id)->first();
+        // find book by id
+        $book = $this->bookService->getBookById($request->user()->id, $id);
 
         // cek buku jika tidak ada
-        if (!$book) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Buku tidak ditemukan atau Anda tidak memiliki izin untuk memperbarui buku ini!'
-            ], 404);
-        }
+        if (!$book) return $this->bookService->checkBook($book);
 
         // update buku
         $book->update([
@@ -85,7 +88,7 @@ class BookController extends Controller
         ]);
 
         // return book
-        return new BookResource(true, 'Buku Berhasil ditambahkan!', $book);
+        return new BookResource(true, 'Buku Berhasil diupdate!', $book);
     }
 
     /**
@@ -96,14 +99,11 @@ class BookController extends Controller
      */
     public function destroy(Request $request, $id)
     {
-        $book = Book::where('user_id', $request->user()->id)->where('id', $id)->first();
+        // find book by id
+        $book = $this->bookService->getBookById($request->user()->id, $id);
+
         // cek buku jika tidak ada
-        if (!$book) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Buku tidak ditemukan atau Anda tidak memiliki izin untuk hapus buku ini!'
-            ], 404);
-        }
+        if (!$book) return $this->bookService->checkBook($book);
 
         $book->delete();
 
