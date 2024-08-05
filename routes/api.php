@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\Api\BookController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -23,3 +24,7 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
 Route::post('register', App\Http\Controllers\Api\RegisterController::class)->name('auth.register');
 
 Route::post('login', App\Http\Controllers\Api\LoginController::class)->name('auth.login');
+
+
+Route::resource('books', BookController::class)
+    ->except(['edit', 'create'])->middleware('auth:api');
