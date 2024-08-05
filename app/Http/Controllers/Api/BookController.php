@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\BookRequest;
 use App\Http\Resources\BookResource;
 use App\Models\Book;
 use Illuminate\Http\Request;
@@ -29,20 +30,8 @@ class BookController extends Controller
      * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\Response
      */
-    public function store(Request $request)
+    public function store(BookRequest $request)
     {
-        // set validator
-        $validator = Validator::make($request->all(), [
-            'title' => 'required',
-            'author' => 'required',
-            'price' => 'required|numeric'
-        ]);
-
-        // jika validator gagal
-        if ($validator->fails()) {
-            return response()->json($validator->errors(), 422);
-        }
-
         // create book
         $book = Book::create([
             'title' => $request->title,
@@ -75,20 +64,8 @@ class BookController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function update(Request $request, $id)
+    public function update(BookRequest $request, $id)
     {
-        // set validator
-        $validator = Validator::make($request->all(), [
-            'title' => 'required',
-            'author' => 'required',
-            'price' => 'required|numeric'
-        ]);
-
-        // jika validator gagal
-        if ($validator->fails()) {
-            return response()->json($validator->errors(), 422);
-        }
-
         // cari buku user yang login
         $book = Book::where('user_id', $request->user()->id)->where('id', $id)->first();
 
