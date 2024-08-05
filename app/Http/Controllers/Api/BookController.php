@@ -60,9 +60,11 @@ class BookController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function show($id)
+    public function show($id, Request $request)
     {
-        //
+        // find book by id
+        $book = Book::where('user_id', $request->user()->id)->where('id', $id)->first();
+        return new BookResource(true, "Buku ditemukan!", $book);
     }
 
     /**
